@@ -59,15 +59,16 @@ class Result:
         return self.data[str(path.name)]
 
     def to_string(self):
-        table_heading = ["Filename" , "Difference"]
+        table_heading = ["Filename" , "Average Difference From Control", "Alternative Implementation Results"]
         row_header_lengths = [len(key) for key in self.data.keys()] + [len(table_heading[0])]
         longest_filename = max(row_header_lengths)
-        longest_result_string = max([len(result) for result in self.data.items()] + [len(table_heading[1])])
-        formattable_string = '{0}\t{1}\n'
-        output_string = formattable_string.format(table_heading[0], table_heading[1])
+        longest_result_string = max([len(result) for result in self.data.items()] + [len(table_heading[1]), len(table_heading[2])])
+        formattable_string = '{0}\t{1}\t{2}\n'
+        output_string = formattable_string.format(table_heading[0].ljust(longest_filename), table_heading[1].ljust(longest_result_string), table_heading[2].ljust(longest_result_string))
         for filename, difference in self.data.items():
-            formatted_filename = filename.rjust(longest_filename)
-            formatted_string = formattable_string.format(formatted_filename, difference)
+            alternative_datatype_result = str(self.get_alternative_implementation_results(Path(filename))).ljust(longest_result_string)
+            formatted_string = formattable_string.format(filename.ljust(longest_filename), str(difference).ljust(longest_result_string),
+                                                         alternative_datatype_result)
             output_string += formatted_string
         return output_string
 
