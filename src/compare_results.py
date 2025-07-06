@@ -36,8 +36,26 @@ class Comparator:
 class Result:
     def __init__(self, data:dict):
         self.data = data
+    def get_alternative_implementation_results(self, path:Path):
+        input_filename = path.name
+        # implicitly requiring the format of the files to be benchmark_bit_no_30[.fixed|.float| ].txt
+        # should ideally be in the tests
+        input_injected_bit =  self.get_injected_bit_from_filename(input_filename)
+        for key in self.data:
+            injected_bit = self.get_injected_bit_from_filename(key)
+            if injected_bit == input_injected_bit and input_filename != key:
+                return self.data[key]
+        return "no data found"
 
-    def get_difference(self, path:Path):
+    def get_injected_bit_from_filename(self, filename):
+        split_on_underscore = filename.split("_")
+        if len(split_on_underscore) == 1:
+            #implied that if there is no underscore = no bit fault injected
+            return None
+        split_on_period = split_on_underscore[3].split(".")
+        return split_on_period[0]
+
+    def get_difference_from_control(self, path:Path):
         return self.data[str(path.name)]
 
     def to_string(self):

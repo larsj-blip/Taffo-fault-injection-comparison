@@ -3,12 +3,12 @@ from unittest import TestCase
 
 from src.compare_results import Comparator
 
-TEST_FILE_1_PATH = Path("./assets/test_folder/testfile1.txt")
-TEST_FILE_2_PATH = Path("./assets/test_folder/testfile2.txt")
+TEST_FILE_1_PATH = Path("assets/test_folder/benchmark_bit_no_30.fixed.txt")
+TEST_FILE_2_PATH = Path("assets/test_folder/benchmark_bit_no_30.float.txt")
 
 TEST_FOLDER_PATH = Path("./assets/test_folder")
-CONTROL_FILE_PATH = Path("./assets/test_folder/control.txt")
-
+CONTROL_FILE_PATH = Path("assets/test_folder/benchmark.float.txt")
+FIXED_POINT_NO_FAULT_INJECTED_PATH = Path("assets/test_folder/benchmark.fixed.txt")
 
 class Test(TestCase):
 
@@ -16,8 +16,8 @@ class Test(TestCase):
         results = self.calculate_test_results()
         file_2_diff = abs(float(TEST_FILE_2_PATH.read_text()) - float(CONTROL_FILE_PATH.read_text()))
         file_1_diff = abs(float(TEST_FILE_1_PATH.read_text()) - float(CONTROL_FILE_PATH.read_text()))
-        self.assertEqual(file_2_diff, results.get_difference(TEST_FILE_2_PATH))
-        self.assertEqual(file_1_diff, results.get_difference(TEST_FILE_1_PATH))
+        self.assertEqual(file_2_diff, results.get_difference_from_control(TEST_FILE_2_PATH))
+        self.assertEqual(file_1_diff, results.get_difference_from_control(TEST_FILE_1_PATH))
 
     def test_should_print_results_with_file_names_in_first_column_in_all_rows_except_heading(self):
         result = self.calculate_test_results()
@@ -31,6 +31,19 @@ class Test(TestCase):
                 filename = line.split()[0]
                 actual_file_names.append(filename)
         self.assertListEqual(expected_file_names, actual_file_names)
+
+    # no time to implement :(
+    def test_should_not_accept_filenames_in_the_wrong_format(self):
+        pass
+
+    def test_should_compare_float_and_fixed_results_for_the_same_injected_bit(self):
+        results = self.calculate_test_results()
+        actual_alternative_implementation_results = results.get_alternative_implementation_results(TEST_FILE_1_PATH)
+        expected_alternative_implementation_results = results.get_difference_from_control(TEST_FILE_2_PATH)
+        self.assertEqual(actual_alternative_implementation_results, expected_alternative_implementation_results)
+        actual_alternative_implementation_results = results.get_alternative_implementation_results(CONTROL_FILE_PATH)
+        expected_alternative_implementation_results = results.get_difference_from_control(FIXED_POINT_NO_FAULT_INJECTED_PATH)
+        self.assertEqual(actual_alternative_implementation_results, expected_alternative_implementation_results)
 
     def calculate_test_results(self):
         comparator = Comparator(control_data_path=CONTROL_FILE_PATH, data_folder_path=TEST_FOLDER_PATH)
