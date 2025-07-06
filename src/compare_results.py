@@ -21,7 +21,7 @@ class Comparator:
                 total_difference = 0
                 for index, value in enumerate(data):
                     total_difference += abs(value - self.control_data[index])
-                self.results[file.name] = total_difference
+                self.results[file.name] = total_difference / len(data)
 
     def cast_string_data_to_float(self, string_data_representation):
         return [float(value) for value in string_data_representation]
@@ -44,8 +44,9 @@ class Result:
         table_heading = ["Filename" , "Difference"]
         row_header_lengths = [len(key) for key in self.data.keys()] + [len(table_heading[0])]
         longest_filename = max(row_header_lengths)
+        longest_result_string = max([len(result) for result in self.data.items()] + [len(table_heading[1])])
         formattable_string = '{0}\t{1}\n'
-        output_string = formattable_string.format(table_heading[0].rjust(longest_filename), table_heading[1])
+        output_string = formattable_string.format(table_heading[0], table_heading[1])
         for filename, difference in self.data.items():
             formatted_filename = filename.rjust(longest_filename)
             formatted_string = formattable_string.format(formatted_filename, difference)
@@ -59,4 +60,4 @@ if __name__ == '__main__':
     else:
         comparator = Comparator(Path(sys.argv[1]), Path(sys.argv[2]))
         comparator.compare()
-        print(comparator.results)
+        print(comparator.get_results().to_string())
