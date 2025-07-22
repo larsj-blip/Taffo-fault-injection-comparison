@@ -5,6 +5,7 @@ from src.compare_results import Comparator
 
 TEST_FILE_1_PATH = Path("assets/test_folder/benchmark_bit_no_30.fixed.txt")
 TEST_FILE_2_PATH = Path("assets/test_folder/benchmark_bit_no_30.float.txt")
+RESULT_OUTPUT_HEADING =
 
 TEST_FOLDER_PATH = Path("./assets/test_folder")
 CONTROL_FILE_PATH = Path("assets/test_folder/benchmark.float.txt")
@@ -12,7 +13,7 @@ FIXED_POINT_NO_FAULT_INJECTED_PATH = Path("assets/test_folder/benchmark.fixed.tx
 
 class Test(TestCase):
 
-    def test_should_calculate_average_difference_between_control_and_fault_injected_files(self):
+    def test_should_calculate_average_difference_between_control_and_fault_injected_files_for_a_single_benchmark(self):
         results = self.calculate_test_results()
         file_2_diff = abs(float(TEST_FILE_2_PATH.read_text()) - float(CONTROL_FILE_PATH.read_text()))
         file_1_diff = abs(float(TEST_FILE_1_PATH.read_text()) - float(CONTROL_FILE_PATH.read_text()))
@@ -26,11 +27,13 @@ class Test(TestCase):
         expected_file_names =[path.name for path in TEST_FOLDER_PATH.glob("*.txt")]
         # ignore header row
         actual_file_names = []
+        heading = results_string_representation_lines[1]
         for line in results_string_representation_lines[1:]:
             if len(line)>0:
                 filename = line.split()[0]
                 actual_file_names.append(filename)
         self.assertListEqual(expected_file_names, actual_file_names)
+        self.assertEqual(heading, RESULT_OUTPUT_HEADING)
 
     # no time to implement :(
     def test_should_not_accept_filenames_in_the_wrong_format(self):
