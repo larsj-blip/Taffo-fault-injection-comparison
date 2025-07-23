@@ -23,7 +23,8 @@ class Comparator:
                     total_difference += abs(value - self.control_data[index])
                 self.results[file.name] = total_difference / len(data)
 
-    def cast_string_data_to_float(self, string_data_representation):
+    @staticmethod
+    def cast_string_data_to_float(string_data_representation):
         return [float(value) for value in string_data_representation]
 
     def get_results(self):
@@ -34,8 +35,15 @@ class Comparator:
 
 
 class Result:
+
+    OUTPUT_COLUMN_HEADERS = ["Filename", "Average Difference From Control", "Alternative Implementation Results"]
+    FORMATTABLE_STRING = '{0}\t{1}\t{2}\n'
+
     def __init__(self, data:dict):
         self.data = data
+        self.longest_filename = max([len(key) for key in self.data.keys()] + [len(self.OUTPUT_COLUMN_HEADERS[0])])
+        self.longest_result_string = max([len(result) for result in self.data.items()] + [len(self.OUTPUT_COLUMN_HEADERS[1]), len(self.OUTPUT_COLUMN_HEADERS[2])])
+
     def get_alternative_implementation_results(self, path:Path):
         input_filename = path.name
         # implicitly requiring the format of the files to be benchmark_bit_no_30[.fixed|.float| ].txt
@@ -47,10 +55,11 @@ class Result:
                 return self.data[key]
         return "no data found"
 
-    def get_injected_bit_from_filename(self, filename):
+    @staticmethod
+    def get_injected_bit_from_filename(filename):
         split_on_underscore = filename.split("_")
         if len(split_on_underscore) == 1:
-            #implied that if there is no underscore = no bit fault injected
+            #implied that if there is no underscore = no fault injected
             return None
         split_on_period = split_on_underscore[3].split(".")
         return split_on_period[0]
@@ -59,22 +68,22 @@ class Result:
         return self.data[str(path.name)]
 
     def to_string(self):
-        column_headers = ["Filename" , "Average Difference From Control", "Alternative Implementation Results"]
-        row_header_lengths = [len(key) for key in self.data.keys()] + [len(column_headers[0])]
-        longest_filename = max(row_header_lengths)
-        longest_result_string = max([len(result) for result in self.data.items()] + [len(column_headers[1]), len(column_headers[2])])
-        formattable_string = '{0}\t{1}\t{2}\n'
-        output_string = formattable_string.format(column_headers[0].ljust(longest_filename), column_headers[1].ljust(longest_result_string), column_headers[2].ljust(longest_result_string))
+        output_string = self.get_output_string_heading()
         for filename, difference in self.data.items():
-            alternative_datatype_result = str(self.get_alternative_implementation_results(Path(filename))).ljust(longest_result_string)
-            formatted_string = formattable_string.format(filename.ljust(longest_filename), str(difference).ljust(longest_result_string),
+            alternative_datatype_result = str(self.get_alternative_implementation_results(Path(filename))).ljust(self.longest_result_string)
+            formatted_string = self.FORMATTABLE_STRING.format(filename.ljust(self.longest_filename), str(difference).ljust(self.longest_result_string),
                                                          alternative_datatype_result)
             output_string += formatted_string
         return output_string
 
+    def get_output_string_heading(self):
+        return self.FORMATTABLE_STRING.format(self.OUTPUT_COLUMN_HEADERS[0].ljust(self.longest_filename),
+                                              self.OUTPUT_COLUMN_HEADERS[1].ljust(self.longest_result_string),
+                                              self.OUTPUT_COLUMN_HEADERS[2].ljust(self.longest_result_string))
+
 
 if __name__ == '__main__':
-    if sys.argv[1] == '-h' or sys.argv[1] == '--help':
+    if sys.argv[1] == '-h' or sys.argv[1] == '--help' or sys.argv[1] == '':
         print('Usage: compare_results <control_data_file_path> <data_folder_path>')
     else:
         comparator = Comparator(Path(sys.argv[1]), Path(sys.argv[2]))

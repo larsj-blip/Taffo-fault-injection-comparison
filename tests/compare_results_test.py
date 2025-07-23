@@ -1,11 +1,10 @@
 from pathlib import Path
 from unittest import TestCase
 
-from src.compare_results import Comparator
+from src.compare_results import Comparator, Result
 
 TEST_FILE_1_PATH = Path("assets/test_folder/benchmark_bit_no_30.fixed.txt")
 TEST_FILE_2_PATH = Path("assets/test_folder/benchmark_bit_no_30.float.txt")
-RESULT_OUTPUT_HEADING =
 
 TEST_FOLDER_PATH = Path("./assets/test_folder")
 CONTROL_FILE_PATH = Path("assets/test_folder/benchmark.float.txt")
@@ -27,13 +26,14 @@ class Test(TestCase):
         expected_file_names =[path.name for path in TEST_FOLDER_PATH.glob("*.txt")]
         # ignore header row
         actual_file_names = []
-        heading = results_string_representation_lines[1]
+        expected_heading = result.get_output_string_heading().strip('\n')
+        actual_heading = results_string_representation_lines[0]
         for line in results_string_representation_lines[1:]:
             if len(line)>0:
                 filename = line.split()[0]
                 actual_file_names.append(filename)
         self.assertListEqual(expected_file_names, actual_file_names)
-        self.assertEqual(heading, RESULT_OUTPUT_HEADING)
+        self.assertEqual(expected_heading, actual_heading)
 
     # no time to implement :(
     def test_should_not_accept_filenames_in_the_wrong_format(self):
