@@ -35,7 +35,7 @@ class Test(TestCase):
         self.assertListEqual(expected_file_names, actual_file_names)
         self.assertEqual(expected_heading, actual_heading)
 
-    # no time to implement :(
+    # no time to implement :( Now the code expects the benchmarks to have names on the format shown in the asset folder.
     def test_should_not_accept_filenames_in_the_wrong_format(self):
         pass
 
