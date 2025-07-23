@@ -1,7 +1,7 @@
 from pathlib import Path
 from unittest import TestCase
 
-from src.compare_results import Comparator, Result
+from src.compare_results import Comparator
 
 TEST_FILE_1_PATH = Path("assets/test_folder/benchmark_bit_no_30.fixed.txt")
 TEST_FILE_2_PATH = Path("assets/test_folder/benchmark_bit_no_30.float.txt")
