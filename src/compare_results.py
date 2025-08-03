@@ -36,13 +36,13 @@ class Comparator:
 
 class Result:
 
-    OUTPUT_COLUMN_HEADERS = ["Filename", "Average Difference From Control", "Alternative Implementation Results"]
-    FORMATTABLE_STRING = '{0}\t{1}\t{2}\n'
+    OUTPUT_COLUMN_HEADERS = ["Filename", "Average Difference From Control"]
+    FORMATTABLE_STRING = '{0}\t{1}\n'
 
     def __init__(self, data:dict):
         self.data = data
         self.longest_filename = max([len(key) for key in self.data.keys()] + [len(self.OUTPUT_COLUMN_HEADERS[0])])
-        self.longest_result_string = max([len(result) for result in self.data.items()] + [len(self.OUTPUT_COLUMN_HEADERS[1]), len(self.OUTPUT_COLUMN_HEADERS[2])])
+        self.longest_result_string = max([len(result) for result in self.data.items()] + [len(self.OUTPUT_COLUMN_HEADERS[1])])
 
     def get_alternative_implementation_results(self, path:Path):
         input_filename = path.name
@@ -70,16 +70,13 @@ class Result:
     def to_string(self):
         output_string = self.get_output_string_heading()
         for filename, difference in self.data.items():
-            alternative_datatype_result = str(self.get_alternative_implementation_results(Path(filename))).ljust(self.longest_result_string)
-            formatted_string = self.FORMATTABLE_STRING.format(filename.ljust(self.longest_filename), str(difference).ljust(self.longest_result_string),
-                                                         alternative_datatype_result)
+            formatted_string = self.FORMATTABLE_STRING.format(filename.ljust(self.longest_filename), str(difference).ljust(self.longest_result_string))
             output_string += formatted_string
         return output_string
 
     def get_output_string_heading(self):
         return self.FORMATTABLE_STRING.format(self.OUTPUT_COLUMN_HEADERS[0].ljust(self.longest_filename),
-                                              self.OUTPUT_COLUMN_HEADERS[1].ljust(self.longest_result_string),
-                                              self.OUTPUT_COLUMN_HEADERS[2].ljust(self.longest_result_string))
+                                              self.OUTPUT_COLUMN_HEADERS[1].ljust(self.longest_result_string))
 
 
 if __name__ == '__main__':
